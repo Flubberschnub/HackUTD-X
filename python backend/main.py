@@ -47,7 +47,20 @@ def getMarket():
 @app.route("/portfolio/")
 def getPortfolio():
     global portfolio
-    return jsonify(("funds: " + str(portfolio.funds), "investments worth: " + str(portfolio.total_worth()), [(str(portfolio.shares[share]), str(portfolio.shares[share].shares)) for share in portfolio.shares]))
+    return jsonify((str(portfolio.funds), str(portfolio.total_worth()), [(str(portfolio.shares[share]), str(portfolio.shares[share].shares)) for share in portfolio.shares]))
+
+@app.route("/time/")
+def getTime():
+    global time
+    return jsonify(time)
+
+@app.route("/investment/<string:investment>/")
+def getInvestment(investment):
+    global market
+    for i in range(len(market)):
+        if str(market[i].id) == investment:
+            return jsonify((str(market[i]), str(market[i].price)))
+    return jsonify("Investment not found")
 
 @app.route("/buy/<int:index>/<int:shares>/")
 def buy(index, shares):
