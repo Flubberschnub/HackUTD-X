@@ -26,9 +26,13 @@ class Investment:
     def __hash__(self):
         return hash(self.id)
     
-    def update(self):
+    def update(self, newsEvents):
         # Randomly change price based on risk
         self.price *= (1 + random.uniform(-self.risk, self.risk))
+        # Update price based on news events
+        for event in newsEvents:
+            if self.source in event.sources:
+                self.price *= (1 + event.effect)
         # Ensure price is at least 1
         if self.price < 1:
             self.price = 1

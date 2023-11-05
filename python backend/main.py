@@ -1,6 +1,9 @@
 import investments
+import news
 from flask import Flask
 from flask import jsonify
+import random
+import json
 # Investment Simulator
 
 # Pass time
@@ -9,20 +12,37 @@ def passTime(months):
     global portfolio
     for i in range(months):
         time += 1
+
+        # Update news
+        for event in newsEvents:
+            event.update()
+            # Remove old news
+            if event.over:
+                newsEvents.remove(event)
+        # Generate news
+        newsEvents.append(news.generateNewsEvent(random.sample(investmentSources, random.randint(1, 3))))
+
         # Update investment stats
         for investment in market:
-            investment.update()
+            investment.update(newsEvents)
         # Update portfolio
         portfolio.update()
 
 # Create test investments
+investmentSources = []
 apple = investments.InvestmentSource("Apple", "Company")
 usGovt = investments.InvestmentSource("US Government", "Government")
 bofa = investments.InvestmentSource("Bank of America", "Bank")
+investmentSources.append(apple)
+investmentSources.append(usGovt)
+investmentSources.append(bofa)
 market = []
 market.append(investments.Stocks(apple, 100, 0.2, "AAPL"))
 market.append(investments.Bonds(usGovt, 100, 0.1, "USG", 3, True, 0.052))
 market.append(investments.CDs(bofa, 100, 0.05, "BAC", 3, True, 0.052))
+
+# Create news event list
+newsEvents = []
 
 
 # Create player portfolio
@@ -38,21 +58,32 @@ time = 0
 app = Flask(__name__)
 @app.route("/test/")
 def test():
-    return "Test"
+    value = {
+        "test": "test"
+    }
+    return json.dumps(value)
 
 @app.route("/market/")
 def getMarket():
-    return jsonify([(str(investment), str(investment.price)) for investment in market])
+    value = [
+        {"name": str(market[i]), "price": (market[i].price)} for i in range(len(market))
+    ]
+    return json.dumps(value)
 
 @app.route("/portfolio/")
 def getPortfolio():
     global portfolio
-    return jsonify((str(portfolio.funds), str(portfolio.total_worth()), [(str(portfolio.shares[share]), str(portfolio.shares[share].shares)) for share in portfolio.shares]))
+    value = {
+        "funds": portfolio.funds,
+        "worth": portfolio.total_worth(),
+        "shares": [{str(portfolio.shares[share]): portfolio.shares[share].shares} for share in portfolio.shares]
+    }
+    return json.dumps(value)
 
 @app.route("/time/")
 def getTime():
     global time
-    return jsonify(time)
+    return{"time": time}
 
 @app.route("/investment/<string:investment>/")
 def getInvestment(investment):
@@ -67,20 +98,27 @@ def buy(index, shares):
     global portfolio
     global market
     portfolio.buy(market[index], shares)
-    return jsonify("Success")
+    return json.dumps({"success": True})
 
 @app.route("/sell/<int:index>/<int:shares>/")
 def sell(index, shares):
     global portfolio
     global market
     portfolio.sell(list(portfolio.shares)[index], shares)
-    return jsonify("Success")
+    return json.dumps({"success": True})
 
 @app.route("/wait/<int:months>/")
 def wait(months):
     global time
     passTime(months)
-    return jsonify("Success")
+    return json.dumps({"success": True})
+
+@app.route("/news/")
+def getNews():
+    value = [
+        {"title": str(newsEvents[i].title), "description": str(newsEvents[i].description)} for i in range(len(newsEvents))
+    ]
+    return json.dumps(value)
 
 if __name__ == "__main__":
     app.run(port=1080)
