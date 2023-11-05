@@ -29,10 +29,10 @@ class Investment:
     def update(self, newsEvents):
         # Randomly change price based on risk
         self.price *= (1 + random.uniform(-self.risk, self.risk))
-        # Update price based on news events
+        # Update price based on news events and risk
         for event in newsEvents:
             if self.source in event.sources:
-                self.price *= (1 + event.effect)
+                self.price *= (1 + event.effect * (1 + self.risk))
         # Ensure price is at least 1
         if self.price < 1:
             self.price = 1
