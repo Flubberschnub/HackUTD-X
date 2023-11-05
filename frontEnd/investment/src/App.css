@@ -17,12 +17,50 @@ div3{
   margin-right: 50px;
 } */
 
-.column {
+.column1 {
   float: left;
   width: 33.33%;
-  }
-  .row::after {
+  margin-left: 20px;
+}
+
+.column2 {
+  float: left;
+  width: 33.33%;
+}
+
+.column3{
+  text-align: right;
+  margin-right: 20px;
+}
+
+.top::after {
   content: "";
   clear: both;
   display: table;
-  }
+}
+
+.top{
+  font-size: 10px;
+  background-color: #FF5733;
+}
+
+.news{
+  background-color: #beff33;
+  width: 25%;
+  text-align: center;
+  height: 100%;
+  display: inline-block;
+}
+
+.newsData{
+  font-size: 10px;
+  border-style: inset 
+}
+
+.investments{
+  background-color: #33d3ff;
+  width: 75%;
+  text-align: center;
+  height: 100%;
+  display: inline-block;
+}
