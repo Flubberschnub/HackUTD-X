@@ -2,6 +2,7 @@ import investments
 import news
 from flask import Flask
 from flask import jsonify
+from flask_cors import CORS, cross_origin
 import random
 import json
 # Investment Simulator
@@ -61,9 +62,11 @@ def test():
     value = {
         "test": "test"
     }
+    value.headers.add('Access-Control-Allow-Origin', '*')
     return json.dumps(value)
 
 @app.route("/market/")
+@cross_origin()
 def getMarket():
     value = [
         {"name": str(market[i]), "price": (market[i].price)} for i in range(len(market))
@@ -71,6 +74,7 @@ def getMarket():
     return json.dumps(value)
 
 @app.route("/portfolio/")
+@cross_origin()
 def getPortfolio():
     global portfolio
     value = {
@@ -81,11 +85,13 @@ def getPortfolio():
     return json.dumps(value)
 
 @app.route("/time/")
+@cross_origin()
 def getTime():
     global time
     return{"time": time}
 
 @app.route("/investment/<string:investment>/")
+@cross_origin()
 def getInvestment(investment):
     global market
     for i in range(len(market)):
@@ -94,6 +100,7 @@ def getInvestment(investment):
     return jsonify("Investment not found")
 
 @app.route("/buy/<int:index>/<int:shares>/")
+@cross_origin()
 def buy(index, shares):
     global portfolio
     global market
@@ -101,6 +108,7 @@ def buy(index, shares):
     return json.dumps({"success": True})
 
 @app.route("/sell/<int:index>/<int:shares>/")
+@cross_origin()
 def sell(index, shares):
     global portfolio
     global market
@@ -108,12 +116,14 @@ def sell(index, shares):
     return json.dumps({"success": True})
 
 @app.route("/wait/<int:months>/")
+@cross_origin()
 def wait(months):
     global time
     passTime(months)
     return json.dumps({"success": True})
 
 @app.route("/news/")
+@cross_origin()
 def getNews():
     value = [
         {"title": str(newsEvents[i].title), "description": str(newsEvents[i].description)} for i in range(len(newsEvents))
